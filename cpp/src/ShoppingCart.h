@@ -22,6 +22,16 @@ public:
     void handleOffers(Receipt& receipt, std::map<Product, Offer> offers, SupermarketCatalog* catalog);
 
 private:
+    int ComputeX(Offer &offer, \
+                double quantity, \
+                Product &product, \
+                SupermarketCatalog* catalog);
+    Discount* createDiscount(Offer &offer, \
+                double quantity, \
+                Product &product, \
+                int x, \
+                SupermarketCatalog* catalog);
+
     std::vector<ProductQuantity> items;
     std::map<Product, double> productQuantities;
 };
