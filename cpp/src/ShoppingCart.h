@@ -22,7 +22,7 @@ public:
     void handleOffers(Receipt& receipt, std::map<Product, Offer> offers, SupermarketCatalog* catalog);
 
 private:
-    int ComputeX(Offer &offer, \
+    int ComputeMinQuantity(Offer &offer, \
                 double quantity, \
                 Product &product, \
                 SupermarketCatalog* catalog);

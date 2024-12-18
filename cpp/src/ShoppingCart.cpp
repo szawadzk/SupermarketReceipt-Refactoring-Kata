@@ -23,51 +23,51 @@ void ShoppingCart::addItemQuantity(const Product& product, double quantity) {
     }
 }
 
-int ShoppingCart::ComputeX(Offer &offer, \
+int ShoppingCart::ComputeMinQuantity(Offer &offer, \
                 double quantity, \
                 Product &product, \
                 SupermarketCatalog* catalog)
 {
     int quantityAsInt = (int) quantity;
     double unitPrice = catalog->getUnitPrice(product);
-    int x = 1;
+    int minQuantity = 1;
 
     if (offer.getOfferType() == SpecialOfferType::ThreeForTwo) 
     {
-        x = 3;
+        minQuantity = 3;
     } 
     else if (offer.getOfferType() == SpecialOfferType::TwoForAmount) 
     {
-        x = 2;
+        minQuantity = 2;
     } 
     else if (offer.getOfferType() == SpecialOfferType::FiveForAmount) 
     {
-        x = 5;
+        minQuantity = 5;
     }
 
-    return x;
+    return minQuantity;
 }
 
 Discount *ShoppingCart::createDiscount(Offer &offer, \
                 double quantity, \
                 Product &product, \
-                int x, \
+                int minQuantity, \
                 SupermarketCatalog* catalog)
 {
     int quantityAsInt = (int) quantity;
-    int numberOfXs = quantityAsInt / x;
+    int numberOfDiscounts = quantityAsInt / minQuantity;
     double unitPrice = catalog->getUnitPrice(product);
 
     Discount* discount = nullptr;
     if (offer.getOfferType() == SpecialOfferType::TwoForAmount && quantityAsInt >= 2) 
     {
-        double total = offer.getArgument() * (quantityAsInt / x) + quantityAsInt % 2 * unitPrice;
+        double total = offer.getArgument() * (quantityAsInt / minQuantity) + quantityAsInt % 2 * unitPrice;
         double discountN = unitPrice * quantity - total;
         discount = new Discount("2 for " + std::to_string(offer.getArgument()), -discountN, product);
     }
     else if (offer.getOfferType() == SpecialOfferType::ThreeForTwo && quantityAsInt > 2) 
     {
-        double discountAmount = quantity * unitPrice - ((numberOfXs * 2 * unitPrice) + quantityAsInt % 3 * unitPrice);
+        double discountAmount = quantity * unitPrice - ((numberOfDiscounts * 2 * unitPrice) + quantityAsInt % 3 * unitPrice);
         discount = new Discount("3 for 2", -discountAmount, product);
     }
     else if (offer.getOfferType() == SpecialOfferType::TenPercentDiscount) 
@@ -76,8 +76,8 @@ Discount *ShoppingCart::createDiscount(Offer &offer, \
     }
     else if (offer.getOfferType() == SpecialOfferType::FiveForAmount && quantityAsInt >= 5) 
     {
-        double discountTotal = unitPrice * quantity - (offer.getArgument() * numberOfXs + quantityAsInt % 5 * unitPrice);
-        discount = new Discount(std::to_string(x) + " for " + std::to_string(offer.getArgument()), -discountTotal, product);
+        double discountTotal = unitPrice * quantity - (offer.getArgument() * numberOfDiscounts + quantityAsInt % 5 * unitPrice);
+        discount = new Discount(std::to_string(minQuantity) + " for " + std::to_string(offer.getArgument()), -discountTotal, product);
     }
 
     return discount;    
@@ -85,7 +85,7 @@ Discount *ShoppingCart::createDiscount(Offer &offer, \
 /*
     Code smells:
     - long method
-        - extract method: ComputeX, createDiscount
+        - extract method: ComputeMinQuantity, createDiscount
 */
 void ShoppingCart::handleOffers(Receipt& receipt, std::map<Product, Offer> offers, SupermarketCatalog* catalog) {
     for (const auto& productQuantity : productQuantities) {
@@ -97,9 +97,9 @@ void ShoppingCart::handleOffers(Receipt& receipt, std::map<Product, Offer> offer
             int quantityAsInt = (int) quantity;
             Discount* discount = nullptr;
 
-            int x = ComputeX(offer, quantity, product, catalog);
+            int minQuantity = ComputeMinQuantity(offer, quantity, product, catalog);
 
-            discount = createDiscount(offer, quantity, product, x, catalog);
+            discount = createDiscount(offer, quantity, product, minQuantity, catalog);
             if (discount != nullptr)
                 receipt.addDiscount(*discount);
         }
