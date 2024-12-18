@@ -86,6 +86,8 @@ Discount *ShoppingCart::createDiscount(Offer &offer, \
     Code smells:
     - long method
         - extract method: ComputeMinQuantity, createDiscount
+    - meaningless name
+        - changed x and numberOfX names to minQuantity and numberOfDiscounts
 */
 void ShoppingCart::handleOffers(Receipt& receipt, std::map<Product, Offer> offers, SupermarketCatalog* catalog) {
     for (const auto& productQuantity : productQuantities) {
